@@ -5,10 +5,10 @@ import Announcement from "@/models/Annoncements";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({
-  region: process.env.AWS_REGION!,
+  region: process.env.NEW_AWS_REGION!,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY!,
-    secretAccessKey: process.env.AWS_SECRET_KEY!,
+    accessKeyId: process.env.NEW_AWS_ACCESS_KEY!,
+    secretAccessKey: process.env.NEW_AWS_SECRET_KEY!,
   },
 });
 
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     // Delete from S3
     await s3.send(
       new DeleteObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME!,
+        Bucket: process.env.NEW_AWS_BUCKET_NAME!,
         Key: key,
       })
     );

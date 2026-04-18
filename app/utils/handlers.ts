@@ -8,7 +8,7 @@
 // };
 
 export const handleWhatsApp = (customMessage?: string) => {
-  const number = "918661025067";
+  const number = "918660125067";
 
   const defaultMessage = "Hi, I am interested in Tiny Talkers Summer Camp";
 
