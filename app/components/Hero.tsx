@@ -36,7 +36,7 @@ export default function Hero({ isMobile }: { isMobile: boolean }) {
             className="relative bg-[#FFF] p-6 md:p-10 rounded-xl shadow-2xl max-w-2xl m-6 md:m-20 text-center"
           >
             {/* WHY TITLE */}
-            <h2 className="text-4xl md:text-6xl font-extrabold text-[#444444] tracking-wide mb-4">
+            <h2 className="text-3xl md:text-6xl font-extrabold text-[#444444] tracking-wide mb-4 text-left">
               “WHY <br className="hidden md:block" />{" "}
               <div className="flex items-center gap-2">
                 <Image
@@ -44,9 +44,9 @@ export default function Hero({ isMobile }: { isMobile: boolean }) {
                   alt="Tiny Talkers Icon"
                   width={56}
                   height={56}
-                  className="w-12 h-12 md:w-20 md:h-20 "
+                  className="w-12 h-12 md:w-20 md:h-20"
                 />
-                <div>
+                <div className="text-left">
                   <span className="text-red-500">T</span>
                   <span className="text-blue-500">i</span>
                   <span className="text-green-500">n</span>
