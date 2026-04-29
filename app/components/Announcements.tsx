@@ -12,6 +12,14 @@ type Announcement = {
   fileUrl: string;
 };
 
+type AnnouncementApi = {
+  _id: string;
+  type: "image" | "video";
+  title: string;
+  desc: string;
+  key: string;
+};
+
 export default function Announcements({ isMobile }: { isMobile: boolean }) {
   const sliderRef = useRef<HTMLDivElement>(null);
 
@@ -24,7 +32,7 @@ export default function Announcements({ isMobile }: { isMobile: boolean }) {
     const data = await res.json();
 
     const updated = await Promise.all(
-      data.map(async (item: any) => {
+      data.map(async (item: AnnouncementApi) => {
         const res = await fetch("/api/get-file-url", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -37,15 +45,19 @@ export default function Announcements({ isMobile }: { isMobile: boolean }) {
           ...item,
           fileUrl: url,
         };
-      })
+      }),
     );
 
     setAnnouncements(updated);
   };
 
-  useEffect(() => {
-    fetchAnnouncements();
-  }, []);
+ useEffect(() => {
+   const loadData = async () => {
+     await fetchAnnouncements();
+   };
+
+   loadData();
+ }, []);
 
   // ================= SCROLL =================
   const scrollLeft = () => {

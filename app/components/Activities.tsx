@@ -51,6 +51,7 @@ export default function Activities({ isMobile }: { isMobile: boolean }) {
               key={i}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: i * 0.2 }}
               whileHover={{ scale: 1.05 }}
               className="flex flex-col items-center"
