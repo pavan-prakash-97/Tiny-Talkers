@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import imageCompression from "browser-image-compression";
 
 type Announcement = {
   _id: string;
@@ -17,8 +18,47 @@ export default function AdminPage() {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [loading, setLoading] = useState(false);
-
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // ================= RESET FORM =================
+  const resetForm = () => {
+    setFile(null);
+    setPreview(null);
+    setTitle("");
+    setDesc("");
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // ================= IMAGE OPTIMIZATION =================
+  const optimizeImage = async (file: File): Promise<File> => {
+    const options = {
+      maxSizeMB: 0.3, // 🔥 ~300KB
+      maxWidthOrHeight: 1280,
+      useWebWorker: true,
+    };
+
+    const compressedFile = await imageCompression(file, options);
+
+    return new File([compressedFile], file.name, {
+      type: "image/webp",
+    });
+  };
+
+  // ================= VIDEO OPTIMIZATION =================
+  const optimizeVideo = async (file: File): Promise<File> => {
+    // NOTE: Browser-side video compression is limited
+    // This keeps file as-is but allows future enhancement
+    const buffer = await file.arrayBuffer();
+
+    return new File([buffer], file.name, {
+      type: "video/mp4",
+    });
+  };
 
   // ================= FETCH =================
   const fetchAnnouncements = async () => {
@@ -39,69 +79,86 @@ export default function AdminPage() {
           ...item,
           fileUrl: url,
         };
-      })
+      }),
     );
 
     setAnnouncements(updated);
   };
 
   useEffect(() => {
-    fetchAnnouncements();
+    const loadData = async () => {
+      await fetchAnnouncements();
+    };
+
+    loadData();
   }, []);
 
   // ================= UPLOAD =================
   const handleUpload = async () => {
-    if (!file) return;
+    if (!file) {
+      alert("Please select a file");
+      return;
+    }
 
     try {
       setLoading(true);
 
-      // 1. Get signed URL
+      let optimizedFile = file;
+
+      if (file.type.startsWith("image")) {
+        optimizedFile = await optimizeImage(file);
+      } else if (file.type.startsWith("video")) {
+        optimizedFile = await optimizeVideo(file);
+      }
+
       const res = await fetch("/api/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fileName: file.name,
-          fileType: file.type,
+          fileName: optimizedFile.name,
+          fileType: optimizedFile.type,
         }),
       });
 
+      if (!res.ok) throw new Error("Failed to get upload URL");
+
       const { url } = await res.json();
 
-      // 2. Upload to S3
-      await fetch(url, {
+      const uploadRes = await fetch(url, {
         method: "PUT",
-        body: file,
-        headers: { "Content-Type": file.type },
+        body: optimizedFile,
+        headers: { "Content-Type": optimizedFile.type },
       });
 
-      // 3. Save to DB
-      const type = file.type.startsWith("video") ? "video" : "image";
+      if (!uploadRes.ok) throw new Error("Upload to S3 failed");
 
-      await fetch("/api/save-announcement", {
+      const type = optimizedFile.type.startsWith("video") ? "video" : "image";
+
+      const saveRes = await fetch("/api/save-announcement", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type,
           title,
           desc,
-          key: file.name,
+          key: optimizedFile.name,
         }),
       });
 
-      alert("Uploaded successfully!");
+      if (!saveRes.ok) throw new Error("Saving data failed");
 
-      // RESET
-      setFile(null);
-      setPreview(null);
-      setTitle("");
-      setDesc("");
+      // ✅ SUCCESS
+      alert("✅ Upload successful!");
 
+      resetForm(); // 🔥 FULL RESET
       fetchAnnouncements();
-
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+
+      // ❌ FAILURE
+      alert("❌ Upload failed. Please try again.");
+
+      resetForm(); // optional: keeps UX clean
     } finally {
       setLoading(false);
     }
@@ -133,8 +190,14 @@ export default function AdminPage() {
     <div className="p-10 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Admin Upload</h1>
 
+      {/* <input
+        type="file"
+        onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
+        className="mb-4"
+      /> */}
       <input
         type="file"
+        ref={fileInputRef}
         onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
         className="mb-4"
       />
@@ -173,9 +236,7 @@ export default function AdminPage() {
       </button>
 
       {/* ================= LIST ================= */}
-      <h2 className="text-2xl font-bold mt-10 mb-6">
-        Uploaded Announcements
-      </h2>
+      <h2 className="text-2xl font-bold mt-10 mb-6">Uploaded Announcements</h2>
 
       {announcements.length === 0 ? (
         <p>No announcements yet</p>
@@ -191,11 +252,13 @@ export default function AdminPage() {
                 {item.type === "image" ? (
                   <img
                     src={item.fileUrl}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 ) : (
                   <video
                     src={item.fileUrl}
+                    preload="metadata"
                     className="w-full h-full object-cover"
                     controls
                   />

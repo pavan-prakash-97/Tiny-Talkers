@@ -57,7 +57,6 @@ export default function Home() {
       {/* EDUCATIONAL OFFER */}
       <Activities isMobile={isMobile} />
 
-
       {/* SECTION 3 - ANNOUNCEMENTS */}
       <Announcements isMobile={isMobile} />
 
