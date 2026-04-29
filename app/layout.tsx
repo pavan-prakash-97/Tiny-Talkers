@@ -16,11 +16,6 @@ export const metadata: Metadata = {
   title: "Tiny Talkers",
   description:
     "Fun-based learning designed to improve communication, creativity, and confidence in kids.",
-  icons: {
-    icon: "/Logo.png",
-    shortcut: "/Logo.png",
-    apple: "/Logo.png",
-  },
 };
 
 export default function RootLayout({

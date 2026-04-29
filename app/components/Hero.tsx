@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { handleWhatsApp } from "../utils/handlers";
 import { ArrowRight } from "lucide-react";
@@ -37,17 +38,28 @@ export default function Hero({ isMobile }: { isMobile: boolean }) {
             {/* WHY TITLE */}
             <h2 className="text-4xl md:text-6xl font-extrabold text-[#444444] tracking-wide mb-4">
               “WHY <br className="hidden md:block" />{" "}
-              <span className="text-red-500">T</span>
-              <span className="text-blue-500">i</span>
-              <span className="text-green-500">n</span>
-              <span className="text-yellow-500">y</span>{" "}
-              <span className="text-purple-500">T</span>
-              <span className="text-pink-500">a</span>
-              <span className="text-indigo-500">l</span>
-              <span className="text-orange-500">k</span>
-              <span className="text-teal-500">e</span>
-              <span className="text-red-400">r</span>
-              <span className="text-blue-400">s</span>?”
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/icon.png"
+                  alt="Tiny Talkers Icon"
+                  width={56}
+                  height={56}
+                  className="w-12 h-12 md:w-20 md:h-20 "
+                />
+                <div>
+                  <span className="text-red-500">T</span>
+                  <span className="text-blue-500">i</span>
+                  <span className="text-green-500">n</span>
+                  <span className="text-yellow-500">y</span>{" "}
+                  <span className="text-purple-500">T</span>
+                  <span className="text-pink-500">a</span>
+                  <span className="text-indigo-500">l</span>
+                  <span className="text-orange-500">k</span>
+                  <span className="text-teal-500">e</span>
+                  <span className="text-red-400">r</span>
+                  <span className="text-blue-400">s</span>?”
+                </div>
+              </div>
             </h2>
 
             {/* SUBTEXT */}
