@@ -130,17 +130,34 @@ export default function Reviews({ isMobile }: { isMobile: boolean }) {
     };
   };
 
-  if (isLoading) {
-    return (
-      <section className="flex justify-center items-center py-20">
-        <Image src="/loading.gif" alt="Loading" width={200} height={200} />
-      </section>
-    );
-  }
+  //   if (isLoading) {
+  //     return (
+  //       <section className="flex justify-center items-center py-20">
+  //         <Image src="/loading.gif" alt="Loading" width={200} height={200} />
+  //       </section>
+  //     );
+  //   }
 
-  if (reviews.length === 0) {
-    return <p className="text-center py-20">No reviews yet</p>;
-  }
+  //   if (reviews.length !== 0) {
+  //     return (
+  //       <div className="flex flex-col items-center justify-center py-16 relative">
+  //         {/* IMAGE */}
+  //         <Image
+  //           src="/loading.gif"
+  //           alt="Loading"
+  //           width={255}
+  //           height={255}
+  //           className="w-64 h-64 rounded-full"
+  //           unoptimized
+  //         />
+
+  //         {/* TEXT ON TOP */}
+  //         <p className="absolute top-53 z-10 text-gray-800 font-bold text-md">
+  //           No reviews yet
+  //         </p>
+  //       </div>
+  //     );
+  //   }
 
   const visibleCount = getVisibleCards();
 
@@ -158,113 +175,145 @@ export default function Reviews({ isMobile }: { isMobile: boolean }) {
     ${isMobile ? "py-8" : "h-screen snap-start"}
   `}
     >
-      {" "}
-      <div className="w-full max-w-4xl mx-auto px-6 text-center rounded-xl py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          What Parents Say
-        </h2>
-        <p className="text-gray-600 text-sm md:text-base mb-12">
-          Real results from parents who chose quality learning.
-        </p>
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-16 relative">
+          {/* IMAGE */}
+          <Image
+            src="/loading.gif"
+            alt="Loading"
+            width={255}
+            height={255}
+            className="w-64 h-64 rounded-full border-2 border-gray-200"
+            unoptimized
+          />
 
-        {/* Carousel */}
-        <div className="relative w-full flex items-center justify-center overflow-hidden rounded-xl py-16 ">
-          {/* LEFT */}
-          <motion.button
-            onClick={() => handleManualScroll("left")}
-            whileTap={{ scale: 0.85 }}
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            className="absolute left-5 z-20 p-2 bg-white rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.35)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.45)] transition"
-          >
-            <ChevronLeftIcon strokeWidth={3} color="silver" />
-          </motion.button>
+          {/* TEXT ON TOP */}
+          <p className="absolute top-53 z-10 text-gray-800 font-bold text-md">
+            Checking...............
+          </p>
+        </div>
+      ) : reviews.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 relative">
+          <Image
+            src="/loading.gif"
+            alt="No updates"
+            width={255}
+            height={255}
+            className="w-64 h-64 rounded-full border-2 border-gray-200"
+            unoptimized
+          />
+          <p className="absolute top-53 z-10 text-gray-800 font-bold text-md">
+            No reviews yet...
+          </p>
+        </div>
+      ) : (
+        <div className="w-full max-w-4xl mx-auto px-6 text-center rounded-xl py-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            What Parents Say
+          </h2>
+          <p className="text-gray-600 text-sm md:text-base mb-12">
+            Real results from parents who chose quality learning.
+          </p>
 
-          {/* CARDS */}
-          <div className="relative flex items-center justify-center h-[320px] w-full overflow-hidden rounded-xl">
-            {displayReviews.map((review) => {
-              const style = getCardStyle(review.displayIndex);
-              const isCenter =
-                review.displayIndex === Math.floor(visibleCount / 2);
+          {/* Carousel */}
+          <div className="relative w-full flex items-center justify-center overflow-hidden rounded-xl py-16 ">
+            {/* LEFT */}
+            <motion.button
+              onClick={() => handleManualScroll("left")}
+              whileTap={{ scale: 0.85 }}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="absolute left-5 z-20 p-2 bg-white rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.35)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.45)] transition"
+            >
+              <ChevronLeftIcon strokeWidth={3} color="silver" />
+            </motion.button>
 
-              return (
-                <MotionDiv
-                  key={review._id}
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.2}
-                  onDragEnd={(event, info) => {
-                    if (info.offset.x > 50) {
-                      handleManualScroll("left");
-                    } else if (info.offset.x < -50) {
-                      handleManualScroll("right");
-                    }
-                  }}
-                  animate={{
-                    scale: style.scale,
-                    x: style.x,
-                    y: style.y,
-                    opacity: style.opacity,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 120,
-                    damping: 10,
-                  }}
-                  style={{
-                    position: "absolute",
-                    zIndex: style.zIndex,
-                  }}
-                  className={`w-[180px] md:w-[220px] lg:w-[240px] bg-white rounded-xl p-4 md:p-5 text-center border transition-all ${
-                    isCenter
-                      ? "shadow-xl border-gray-200"
-                      : "shadow-md opacity-90"
-                  }`}
-                >
-                  <img
-                    src={getAvatarUrl(review.name)}
-                    className={`mx-auto mb-2 rounded-full ring-2 ring-gray-200 ${
-                      isCenter ? "w-16 md:w-20" : "w-12 md:w-16"
+            {/* CARDS */}
+            <div className="relative flex items-center justify-center h-[320px] w-full overflow-hidden rounded-xl">
+              {displayReviews.map((review) => {
+                const style = getCardStyle(review.displayIndex);
+                const isCenter =
+                  review.displayIndex === Math.floor(visibleCount / 2);
+
+                return (
+                  <MotionDiv
+                    key={review._id}
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(event, info) => {
+                      if (info.offset.x > 50) {
+                        handleManualScroll("left");
+                      } else if (info.offset.x < -50) {
+                        handleManualScroll("right");
+                      }
+                    }}
+                    animate={{
+                      scale: style.scale,
+                      x: style.x,
+                      y: style.y,
+                      opacity: style.opacity,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 120,
+                      damping: 10,
+                    }}
+                    style={{
+                      position: "absolute",
+                      zIndex: style.zIndex,
+                    }}
+                    className={`w-[180px] md:w-[220px] lg:w-[240px] bg-white rounded-xl p-4 md:p-5 text-center border transition-all ${
+                      isCenter
+                        ? "shadow-xl border-gray-200"
+                        : "shadow-md opacity-90"
                     }`}
-                  />
+                  >
+                    <img
+                      src={getAvatarUrl(review.name)}
+                      className={`mx-auto mb-2 rounded-full ring-2 ring-gray-200 ${
+                        isCenter ? "w-16 md:w-20" : "w-12 md:w-16"
+                      }`}
+                    />
 
-                  <p className="font-semibold text-sm text-gray-900 mb-2">
-                    {review.name}
-                  </p>
+                    <p className="font-semibold text-sm text-gray-900 mb-2">
+                      {review.name}
+                    </p>
 
-                  <div className="flex justify-center mb-2">
-                    <StarRating rating={review.rating} />
-                  </div>
+                    <div className="flex justify-center mb-2">
+                      <StarRating rating={review.rating} />
+                    </div>
 
-                  <p className="text-xs text-gray-700 line-clamp-3">
-                    {review.text}
-                  </p>
-                </MotionDiv>
-              );
-            })}
+                    <p className="text-xs text-gray-700 line-clamp-3">
+                      {review.text}
+                    </p>
+                  </MotionDiv>
+                );
+              })}
+            </div>
+
+            {/* RIGHT */}
+            <motion.button
+              onClick={() => handleManualScroll("right")}
+              whileTap={{ scale: 0.85 }}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="absolute right-5 z-20 p-2 bg-white rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.35)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.45)] transition"
+            >
+              <ChevronRightIcon strokeWidth={3} color="silver" />
+            </motion.button>
           </div>
 
-          {/* RIGHT */}
-          <motion.button
-            onClick={() => handleManualScroll("right")}
-            whileTap={{ scale: 0.85 }}
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            className="absolute right-5 z-20 p-2 bg-white rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.35)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.45)] transition"
+          {/* BUTTON */}
+          <a
+            href={googleReviewsLink}
+            target="_blank"
+            className="mt-6 inline-block bg-blue-600 text-white px-6 py-2 rounded-full font-bold hover:scale-105 transition"
           >
-            <ChevronRightIcon strokeWidth={3} color="silver" />
-          </motion.button>
+            View on Google
+          </a>
         </div>
-
-        {/* BUTTON */}
-        <a
-          href={googleReviewsLink}
-          target="_blank"
-          className="mt-6 inline-block bg-blue-600 text-white px-6 py-2 rounded-full font-bold hover:scale-105 transition"
-        >
-          View on Google
-        </a>
-      </div>
+      )}
     </section>
   );
 }

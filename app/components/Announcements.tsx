@@ -107,7 +107,7 @@ export default function Announcements({ isMobile }: { isMobile: boolean }) {
               alt="Loading"
               width={255}
               height={255}
-              className="w-64 h-64"
+              className="w-64 h-64 rounded-full"
               unoptimized
             />
 
@@ -123,7 +123,7 @@ export default function Announcements({ isMobile }: { isMobile: boolean }) {
               alt="No updates"
               width={255}
               height={255}
-              className="w-64 h-64"
+              className="w-64 h-64 rounded-full"
               unoptimized
             />
             <p className="absolute top-53 z-10 text-gray-800 font-bold text-md">
