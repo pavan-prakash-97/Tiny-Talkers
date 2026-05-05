@@ -88,7 +88,7 @@ export default function Announcements({ isMobile }: { isMobile: boolean }) {
   return (
     <section
       className={`
-        flex items-center justify-center px-4
+        flex items-center justify-center px-4 bg-gray-100
         ${isMobile ? "py-16" : "h-screen snap-start"}
       `}
     >

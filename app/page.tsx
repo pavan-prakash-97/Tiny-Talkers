@@ -8,6 +8,7 @@ import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Activities from "./components/Activities";
 import Announcements from "./components/Announcements";
+import Reviews from "./components/Reviews";
 import Organizer from "./components/Organizer";
 import EnquiryForm from "./components/EnquiryForm";
 import Footer from "./components/Footer";
@@ -60,13 +61,16 @@ export default function Home() {
       {/* SECTION 3 - ANNOUNCEMENTS */}
       <Announcements isMobile={isMobile} />
 
-      {/* SECTION 4 - ORGANISER */}
+      {/* SECTION 4 - REVIEWS */}
+      <Reviews isMobile={isMobile} />
+
+      {/* SECTION 5 - ORGANISER */}
       <Organizer isMobile={isMobile} />
 
-      {/* SECTION 5 - ENQUIRY */}
+      {/* SECTION 6 - ENQUIRY */}
       <EnquiryForm isMobile={isMobile} />
 
-      {/* SECTION 6 - FOOTER */}
+      {/* SECTION 7 - FOOTER */}
       <Footer isMobile={isMobile} />
 
       {/* ⬆️ SCROLL TO TOP BUTTON */}

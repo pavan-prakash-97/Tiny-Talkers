@@ -6,7 +6,7 @@ export default function Activities({ isMobile }: { isMobile: boolean }) {
   return (
     <section
       className={`
-    flex flex-col items-center justify-center bg-gray-100 transition-all duration-700 ease-in-out
+    flex flex-col items-center justify-center transition-all duration-700 ease-in-out
     ${isMobile ? "py-8" : "h-screen snap-start"}
   `}
     >
