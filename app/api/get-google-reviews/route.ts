@@ -1,259 +1,94 @@
+import { NextResponse } from "next/server";
+
+export const runtime = "nodejs";
+
 export async function GET() {
-  try {
-    const businessName = "Tiny Talkers Learning Hub Tumkur";
-    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(businessName + " reviews")}`;
+  const reviews = [
+    {
+      _id: "1",
+      name: "PAVAN PRAKASH",
+      rating: 5,
+      text: "Excellent place for kids to improve English communication and confidence. Friendly teachers and great learning atmosphere!",
+      avatarUrl:
+        "https://ui-avatars.com/api/?name=PAVAN+PRAKASH&background=4F46E5&color=fff",
+      createdAt: "6 reviews",
+    },
+    {
+      _id: "2",
+      name: "Subramanya A",
+      rating: 5,
+      text: "Great learning center for kids. Teacher is very patient and makes learning fun. Kids can understand easily and feel happy while learning.",
+      avatarUrl:
+        "https://ui-avatars.com/api/?name=Subramanya+A&background=10B981&color=fff",
+      createdAt: "a day ago",
+    },
+    {
+      _id: "3",
+      name: "Kavya Nanjareddy",
+      rating: 5,
+      text: "Very good place to learn. Trainer is highly knowledgeable, patient, and supportive, making it easy to understand even complex topics. I had a great experience here and would definitely recommend it to others.",
+      avatarUrl:
+        "https://ui-avatars.com/api/?name=Kavya+Nanjareddy&background=EC4899&color=fff",
+      createdAt: "a day ago",
+    },
+    {
+      _id: "4",
+      name: "Praveen Pravi",
+      rating: 5,
+      text: "Good teaching ❤️",
+      avatarUrl:
+        "https://ui-avatars.com/api/?name=Praveen+Pravi&background=F59E0B&color=fff",
+      createdAt: "2 days ago",
+    },
+    {
+      _id: "5",
+      name: "Nagu Nagamani",
+      rating: 5,
+      text: "Good place for gaining English proficiency ❤️",
+      avatarUrl:
+        "https://ui-avatars.com/api/?name=Nagu+Nagamani&background=3B82F6&color=fff",
+      createdAt: "2 days ago",
+    },
+    {
+      _id: "6",
+      name: "Manjunath Sampath",
+      rating: 5,
+      text: "Great place for kids tutions, very knowledgeable teacher and staff...",
+      avatarUrl:
+        "https://ui-avatars.com/api/?name=Manjunath+Sampath&background=8B5CF6&color=fff",
+      createdAt: "6 days ago",
+    },
+    {
+      _id: "7",
+      name: "Nageshkumar gn Nagesh",
+      rating: 5,
+      text: "Best place to learn spoken English. Teacher has good expertise in teaching. ❤️",
+      avatarUrl:
+        "https://ui-avatars.com/api/?name=Nageshkumar+Nagesh&background=14B8A6&color=fff",
+      createdAt: "6 days ago",
+    },
+    {
+      _id: "8",
+      name: "Sudhakar C R",
+      rating: 5,
+      text: "Child friendly, hygienic set-up with easy access and unique teaching methods. Learning spoken English at younger age adds more value addition. ❤️",
+      avatarUrl:
+        "https://ui-avatars.com/api/?name=Sudhakar+C+R&background=EF4444&color=fff",
+      createdAt: "a week ago",
+    },
+    {
+      _id: "9",
+      name: "Arun Kumar G",
+      rating: 5,
+      text: "Excellent learning atmosphere and supportive teaching methods for children.",
+      avatarUrl:
+        "https://ui-avatars.com/api/?name=Arun+Kumar+G&background=6366F1&color=fff",
+      createdAt: "6 days ago",
+    },
+  ];
 
-    // Define the Review interface
-    interface Review {
-      _id: string;
-      name: string;
-      rating: number;
-      text: string;
-      createdAt: string;
-    }
-
-    // Function to decode HTML entities
-    const decodeHtmlEntities = (text: string) => {
-      const entities: { [key: string]: string } = {
-        "&quot;": '"',
-        "&ldquo;": '"',
-        "&rdquo;": '"',
-        "&#34;": '"',
-        "&apos;": "'",
-        "&#39;": "'",
-        "&amp;": "&",
-        "&lt;": "<",
-        "&gt;": ">",
-        "&nbsp;": " ",
-      };
-      return text.replace(
-        /&[a-z]+;|&#\d+;/gi,
-        (match) => entities[match] || match,
-      );
-    };
-
-    // Fetch the Google search page
-    const response = await fetch(searchUrl, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-    });
-
-    const html = await response.text();
-
-    // Extract rating and review count from the HTML
-    const ratingMatch = html.match(
-      /(\d\.\d)\s*★+\s*\((\d+)\s*(?:reviews?|ratings?)\)/i,
-    );
-    const reviewMatch = html.match(
-      /"reviewCount":(\d+)|"ratingCount":(\d+)|(\d+)\s+reviews?/i,
-    );
-
-    // Parse reviews from structured data
-    const reviewsData: Review[] = [];
-
-    // Look for structured data in the page
-    const structuredDataMatch = html.match(
-      /"review":\[\{[^}]*?"author":\{"@type":"Person","name":"([^"]+)"[^}]*?"ratingValue":(\d)[^}]*?"text":"([^"]*)"[^}]*?"datePublished":"([^"]+)"/g,
-    );
-
-    if (structuredDataMatch) {
-      structuredDataMatch.forEach((match) => {
-        const authorMatch = match.match(/"name":"([^"]+)"/);
-        const ratingMatch = match.match(/"ratingValue":(\d)/);
-        const textMatch = match.match(/"text":"([^"]*?)(?:\\"|"[,}])/);
-        const dateMatch = match.match(/"datePublished":"([^"]+)"/);
-
-        if (authorMatch && ratingMatch && textMatch) {
-          let reviewText =
-            textMatch[1]
-              ?.replace(/\\n/g, " ")
-              .replace(/\\"/g, '"')
-              .substring(0, 500) || "Great experience!";
-
-          // Decode HTML entities
-          reviewText = decodeHtmlEntities(reviewText);
-
-          reviewsData.push({
-            _id: `google_${Date.now()}_${Math.random()}`,
-            name: decodeHtmlEntities(authorMatch[1] || "Anonymous"),
-            rating: parseInt(ratingMatch[1]) || 5,
-            text: reviewText,
-            createdAt: dateMatch
-              ? new Date(dateMatch[1]).toISOString()
-              : new Date().toISOString(),
-          });
-        }
-      });
-    }
-
-    // If no structured data found, return sample data with message
-    if (reviewsData.length === 0) {
-      // Fallback: Create mock data based on what we see
-      const mockReviews = [
-        {
-          _id: "google_1",
-          name: "Subramanya A",
-          rating: 5,
-          text: "Great learning center for kids. Teacher is very patient and makes learning fun. Kids can understand easily and feel happy while learning.",
-          createdAt: new Date(Date.now() - 17 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          _id: "google_2",
-          name: "Kavya Nanjareddy",
-          rating: 5,
-          text: "Very good place to learn. Trainer is highly knowledgeable, patient, and supportive, making it easy to understand even complex topics. I had a great experience here and would definitely recommend it to others.",
-          createdAt: new Date(Date.now() - 17 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          _id: "google_3",
-          name: "Praveen Pravi",
-          rating: 5,
-          text: "Excellent coaching center with very interactive classes. The staff is knowledgeable and supportive. Highly recommended for anyone looking to improve their English speaking skills.",
-          createdAt: new Date(
-            Date.now() - 5 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-        },
-        {
-          _id: "google_4",
-          name: "Priya S.",
-          rating: 5,
-          text: "Amazing learning environment! My child has improved so much in just a few weeks. Prema's teaching style is interactive and engaging.",
-          createdAt: new Date(
-            Date.now() - 14 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-        },
-        {
-          _id: "google_5",
-          name: "Rajesh K.",
-          rating: 5,
-          text: "Best decision for our kid's English learning. The curriculum is well-structured and the staff is very supportive.",
-          createdAt: new Date(
-            Date.now() - 30 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-        },
-        {
-          _id: "google_6",
-          name: "Anjali M.",
-          rating: 5,
-          text: "Highly recommend Tiny Talkers! My daughter is now confident in speaking English. The activities are fun and educational.",
-          createdAt: new Date(
-            Date.now() - 21 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-        },
-        {
-          _id: "google_7",
-          name: "Vikram P.",
-          rating: 5,
-          text: "Excellent coaching center with experienced mentors. Our son enjoys every session and shows great improvement in his English skills.",
-          createdAt: new Date(
-            Date.now() - 10 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-        },
-        {
-          _id: "google_8",
-          name: "Divya N.",
-          rating: 5,
-          text: "World class teaching methods and very friendly staff. The one-on-one attention given to each student is commendable. Worth every penny!",
-          createdAt: new Date(
-            Date.now() - 3 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-        },
-      ];
-
-      return Response.json({
-        reviews: mockReviews,
-        averageRating: 5.0,
-        totalReviews: 8,
-        source: "Google Business Profile",
-      });
-    }
-
-    return Response.json({
-      reviews: reviewsData.slice(0, 10),
-      averageRating: ratingMatch ? parseFloat(ratingMatch[1]) : 5.0,
-      totalReviews: reviewMatch
-        ? parseInt(reviewMatch[1] || reviewMatch[2] || reviewMatch[3])
-        : reviewsData.length,
-      source: "Google Business Profile",
-    });
-  } catch (error) {
-    console.error("Error fetching Google reviews:", error);
-
-    // Return fallback reviews on error
-    const fallbackReviews = [
-      {
-        _id: "fallback_1",
-        name: "Subramanya A",
-        rating: 5,
-        text: "Great learning center for kids. Teacher is very patient and makes learning fun.",
-        createdAt: new Date(Date.now() - 17 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        _id: "fallback_2",
-        name: "Kavya Nanjareddy",
-        rating: 5,
-        text: "Very good place to learn. Trainer is highly knowledgeable and supportive.",
-        createdAt: new Date(Date.now() - 17 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        _id: "fallback_3",
-        name: "Praveen Pravi",
-        rating: 5,
-        text: "Excellent coaching center with very interactive classes.",
-        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        _id: "fallback_4",
-        name: "Priya S.",
-        rating: 5,
-        text: "Amazing learning environment! My child has improved so much.",
-        createdAt: new Date(
-          Date.now() - 14 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-      },
-      {
-        _id: "fallback_5",
-        name: "Rajesh K.",
-        rating: 5,
-        text: "Best decision for our kid's English learning.",
-        createdAt: new Date(
-          Date.now() - 30 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-      },
-      {
-        _id: "fallback_6",
-        name: "Anjali M.",
-        rating: 5,
-        text: "Highly recommend Tiny Talkers! My daughter is now confident.",
-        createdAt: new Date(
-          Date.now() - 21 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-      },
-      {
-        _id: "fallback_7",
-        name: "Vikram P.",
-        rating: 5,
-        text: "Excellent coaching center with experienced mentors.",
-        createdAt: new Date(
-          Date.now() - 10 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-      },
-      {
-        _id: "fallback_8",
-        name: "Divya N.",
-        rating: 5,
-        text: "World class teaching methods and very friendly staff.",
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ];
-
-    return Response.json({
-      reviews: fallbackReviews,
-      averageRating: 5.0,
-      totalReviews: 8,
-      source: "Google Business Profile (Cached)",
-    });
-  }
+  return NextResponse.json({
+    success: true,
+    reviews,
+  });
 }

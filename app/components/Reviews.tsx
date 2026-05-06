@@ -24,10 +24,12 @@ type Review = {
   rating: number;
   text: string;
   createdAt: string;
+  avatarUrl?: string;
+  profile_photo_url?: string;
 };
 
 const googleReviewsLink =
-  "https://www.google.com/search?q=tiny+talkers+learning+hub+tumkur+reviews";
+  "https://www.google.com/search?q=Tiny+Talkers+Learning+Hub+Tumkur";
 
 export default function Reviews({ isMobile }: { isMobile: boolean }) {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -39,14 +41,35 @@ export default function Reviews({ isMobile }: { isMobile: boolean }) {
   useEffect(() => {
     const loadReviews = async () => {
       try {
+        setIsLoading(true);
+
         const res = await fetch("/api/get-google-reviews");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch reviews");
+        }
+
         const data = await res.json();
 
-        if (!data.error) {
-          setReviews(data.reviews);
+        if (data?.reviews?.length) {
+          const formattedReviews = data.reviews.map(
+            (review: Review, index: number) => ({
+              _id: review._id || String(index),
+              name: review.name || "Anonymous",
+              rating: Number(review.rating || 5),
+              text: review.text || "No review text available.",
+              createdAt: review.createdAt || new Date().toISOString(),
+              avatarUrl: review.avatarUrl || review.profile_photo_url || "",
+            }),
+          );
+
+          setReviews(formattedReviews);
+        } else {
+          setReviews([]);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Review fetch error:", err);
+        setReviews([]);
       } finally {
         setIsLoading(false);
       }
@@ -130,35 +153,6 @@ export default function Reviews({ isMobile }: { isMobile: boolean }) {
     };
   };
 
-  //   if (isLoading) {
-  //     return (
-  //       <section className="flex justify-center items-center py-20">
-  //         <Image src="/loading.gif" alt="Loading" width={200} height={200} />
-  //       </section>
-  //     );
-  //   }
-
-  //   if (reviews.length !== 0) {
-  //     return (
-  //       <div className="flex flex-col items-center justify-center py-16 relative">
-  //         {/* IMAGE */}
-  //         <Image
-  //           src="/loading.gif"
-  //           alt="Loading"
-  //           width={255}
-  //           height={255}
-  //           className="w-64 h-64 rounded-full"
-  //           unoptimized
-  //         />
-
-  //         {/* TEXT ON TOP */}
-  //         <p className="absolute top-53 z-10 text-gray-800 font-bold text-md">
-  //           No reviews yet
-  //         </p>
-  //       </div>
-  //     );
-  //   }
-
   const visibleCount = getVisibleCards();
 
   const displayReviews = Array.from({ length: visibleCount }).map((_, i) => {
@@ -167,6 +161,20 @@ export default function Reviews({ isMobile }: { isMobile: boolean }) {
       reviews.length;
     return { ...reviews[index], displayIndex: i };
   });
+
+  // const displayReviews =
+  //   reviews.length > 0
+  //     ? Array.from({ length: visibleCount }).map((_, i) => {
+  //         const index =
+  //           (activeIndex - Math.floor(visibleCount / 2) + i + reviews.length) %
+  //           reviews.length;
+
+  //         return {
+  //           ...reviews[index],
+  //           displayIndex: i,
+  //         };
+  //       })
+  //     : [];
 
   return (
     <section
@@ -269,8 +277,12 @@ export default function Reviews({ isMobile }: { isMobile: boolean }) {
                         : "shadow-md opacity-90"
                     }`}
                   >
-                    <img
-                      src={getAvatarUrl(review.name)}
+                    <Image
+                      src={review.avatarUrl || getAvatarUrl(review.name)}
+                      alt={review.name}
+                      width={isCenter ? 80 : 64}
+                      height={isCenter ? 80 : 64}
+                      unoptimized
                       className={`mx-auto mb-2 rounded-full ring-2 ring-gray-200 ${
                         isCenter ? "w-16 md:w-20" : "w-12 md:w-16"
                       }`}
